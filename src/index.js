@@ -1,59 +1,56 @@
-const renderedDogs = (dogos) => {
-  renderDogs(dogos);
-};
+let dogs = [];
+let filter = false;
 
-//eventListeners
+const filters = document.querySelector("#good-dog-filter");
+const dogBar = document.querySelector("#dog-bar");
 
-const filter = document.querySelector("#good-dog-filter");
-filter.addEventListener("click", (e) => {
-  if (filter.innerText.includes("OFF")) {
-    filter.innerText = "Filter good dogs: ON";
+console.log(dogBar);
+filters.addEventListener("click", (e) => {
+  if (!filter) {
+    filters.innerText = "Filter good dogs: ON";
+    filter = true;
+    showDogs(dogs.filter((d) => d.isGoodDog));
   } else {
-    filter.innerText = "Filter good dogs: OFF";
+    filters.innerText = "Filter good dogs: OFF";
+    filter = false;
+    showDogs(dogs);
   }
 });
 
-//   if (!this.dataset.click) {
-//     this.setAttribute("data-click", "true");
-//     this.innerText = "Filter good dogs: ON";
-//   } else {
-//     this.setAttribute("data-click", "false");
-//     this.innerText = "FILTER";
-//     // this.removeAttribute((innerText = "Filter good dogs: ON"));
-//   }
-// filter.innerText = "Filter good dogs: ON";
-const renderDogs = (dogos) => {
-  const dogBar = document.querySelector("#dog-bar");
+const showDogs = (dogs) => {
+  dogBar.innerHTML = "";
+  dogs.forEach(renderDog);
+};
+
+const renderDog = (dog) => {
+  // dogBar.innerHTML = "";
   const spn = document.createElement("span");
-  spn.textContent = dogos.name;
+  spn.textContent = dog.name;
   dogBar.append(spn);
 
   spn.addEventListener("click", (e) => {
-    e.preventDefault();
-    e.target.remove();
+    console.log("SUP");
+
     const imgInfo = document.createElement("img");
     const h2Info = document.createElement("h2");
     const btn = document.createElement("button");
-    console.log(dogos.isGoodDog);
-    // debugger;
+
     btn.addEventListener("click", (e) => {
-      dogos.isGoodDog = !dogos.isGoodDog;
-      // debugger;
-      console.log(dogos.isGoodDog);
-      btn.innerText = dogos.isGoodDog !== true ? "Bad Dog!" : "Good Dog!";
-      console.log(dogos);
-      updateValue(dogos);
+      dogBar.innerHtml = "";
+
+      btn.innerText = dog.isGoodDog !== true ? "Bad Dog!" : "Good Dog!";
+      dog.isGoodDog = !dog.isGoodDog;
+      updateValue(dog);
     });
 
     const dogInfo = document.querySelector("#dog-info");
     dogInfo.innerHTML = "";
 
-    imgInfo.src = dogos.image;
-    h2Info.textContent = dogos.name;
-    btn.innerText = dogos.isGoodDog === true ? "Bad Dog!" : "Good Dog!";
+    imgInfo.src = dog.image;
+    h2Info.textContent = dog.name;
+    btn.innerText = dog.isGoodDog === true ? "Bad Dog!" : "Good Dog!";
 
     dogInfo.append(imgInfo, h2Info, btn);
-    // return renderDogs(dogos);
   });
 };
 
@@ -67,18 +64,14 @@ function updateValue(dogos) {
   })
     .then((res) => res.json())
     .then((data) => console.log(data));
-  // .then((data) => console.log(data));
 }
 
 function fetchDog() {
   fetch("http://localhost:3000/pups")
     .then((res) => res.json())
-    .then((dogs) => {
-      const dogos = Object.values(dogs);
-      console.log(dogos);
-      // arrayOfDogObj.push(dogos);
-      // console.log(arrayOfDogObj);
-      dogos.forEach(renderedDogs);
+    .then((results) => {
+      dogs = results;
+      showDogs(dogs);
     });
 }
 
